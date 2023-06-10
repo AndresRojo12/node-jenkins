@@ -9,13 +9,15 @@ pipeline {
         }
         stage('Construir imagen de Docker'){
             steps {
+                script {
                     withCredentials([
                         string(credentialsId: 'URI_MONGO', variable: 'URI_MONGO')
                     ]) {
-                        docker.build('proyecto-backend-microservicio:latest', '--build-arg URI_MONGO=${URI_MONGO} .')
+                        docker.build('proyecto-backend-microservicio:v1', '--build-arg URI_MONGO=${URI_MONGO} .')
                     }
                 }
-             }
+            }
+        }
         stage('Desplegar contenedores Docker'){
             steps {
                 script {
