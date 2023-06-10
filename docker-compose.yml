@@ -1,0 +1,28 @@
+version: "3.7"
+services:
+  proyecto-backend-microservicio:
+    container_name: proyecto-backend-microservicio
+    image: proyecto-backend-microservicio:latest
+    build:
+      context: .
+    ports:
+      - "4001"
+    environment:
+      - URI_MONGO=${URI_MONGO}
+      - PORT=4001
+    networks:
+      - proyecto-app-backend 
+
+  balanceador_de_carga:
+    container_name: balanceador_de_carga
+    image: balanceador_de_carga:latest
+    build:
+      context: ./balanceador
+    ports:
+      - "4003:80"
+    networks:
+      - proyecto-app-backend          
+networks:
+  proyecto-app-backend:
+
+  
