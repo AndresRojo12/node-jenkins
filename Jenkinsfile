@@ -13,7 +13,7 @@ pipeline {
                     withCredentials([
                         string(credentialsId: 'URI_MONGO', variable: 'URI_MONGO')
                     ]) {
-                        sh 'docker build -t proyecto-backend-microservicio:v1 --build-arg URI_MONGO=${URI_MONGO} .'
+                        docker.build('proyecto-backend-microservicio:v1', '--build-arg URI_MONGO=${URI_MONGO} .')
                     }
                 }
             }
@@ -24,9 +24,10 @@ pipeline {
                     withCredentials([
                         string(credentialsId: 'URI_MONGO', variable: 'URI_MONGO')
                     ]) {
-                        sh '''
-                            docker-compose up -d
-                        '''
+                        sh """
+                            sed 's|\\${URI_MONGO}|${URI_MONGO}|g' docker-compose.yml > docker-compose-update.yml
+                            docker-compose -f docker-compose-update.yml up -d
+                        """
                     }
                 }
             }
