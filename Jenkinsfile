@@ -2,21 +2,34 @@ pipeline {
     agent any
 
     stages {
-        stage('Clonar el Repositorio') {
+        stage('Clonar el Repositorio'){
             steps {
                 git branch: 'main', credentialsId: 'git-jenkins', url: 'https://github.com/AndresRojo12/node-jenkins.git'
             }
         }
-        
-        stage('Construir imagen de Docker') {
+        stage('Construir imagen de Docker'){
             steps {
-                sh 'docker build -t proyecto-backend-microservicio:v1 .'
+                script {
+                    withCredentials([
+                        string(credentialsId: 'URI_MONGO', variable: 'URI_MONGO')
+                    ]) {
+                       def dockerImage= docker.build('proyecto-backend-microservicio:v1', '--build-arg URI_MONGO=${URI_MONGO} .')
+                    }
+                }
             }
         }
-        
-        stage('Desplegar contenedor Docker') {
+        stage('Desplegar contenedores Docker'){
             steps {
-                sh 'docker run -d -p 80:80 --name proyecto-backend-microservicio proyecto-backend-microservicio:v1'
+                script {
+                    withCredentials([
+                            string(credentialsId: 'URI_MONGO', variable: 'URI_MONGO')
+                    ]) {
+                        sh """
+                            sed 's|\\${URI_MONGO}|${URI_MONGO}|g' docker-compose.yml > docker-compose-update.yml
+                            docker-compose -f docker-compose-update.yml up -d
+                        """
+                    }
+                }
             }
         }
     }
