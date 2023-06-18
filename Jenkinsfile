@@ -4,16 +4,16 @@ pipeline {
     stages {
         stage('Clonar el Repositorio'){
             steps {
-                git branch: 'main', credentialsId: 'git-jenkins', url: 'https://github.com/julioiud/node-jenkins.git'
+                git branch: 'main', credentialsId: 'git-jenkins', url: 'https://github.com/AndresRojo12/node-jenkins.git'
             }
         }
         stage('Construir imagen de Docker'){
             steps {
                 script {
                     withCredentials([
-                        string(credentialsId: 'MONGO_URI', variable: 'MONGO_URI')
+                        string(credentialsId: 'URI_MONGO', variable: 'URI_MONGO')
                     ]) {
-                        docker.build('proyectos-backend-micro:v1', '--build-arg MONGO_URI=${MONGO_URI} .')
+                        docker.build('proyectos-backend-micro:v1', '--build-arg URI_MONGO=${URI_MONGO} .')
                     }
                 }
             }
@@ -22,10 +22,10 @@ pipeline {
             steps {
                 script {
                     withCredentials([
-                            string(credentialsId: 'MONGO_URI', variable: 'MONGO_URI')
+                            string(credentialsId: 'URI_MONGO', variable: 'URI_MONGO')
                     ]) {
                         sh """
-                            sed 's|\\${MONGO_URI}|${MONGO_URI}|g' docker-compose.yml > docker-compose-update.yml
+                            sed 's|\\${URI_MONGO}|${URI_MONGO}|g' docker-compose.yml > docker-compose-update.yml
                             docker-compose -f docker-compose-update.yml up -d
                         """
                     }
