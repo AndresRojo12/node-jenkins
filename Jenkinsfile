@@ -2,36 +2,31 @@ pipeline {
     agent any
 
     stages {
-        stage('Clonar el Repositorio') {
+        stage('Clonar el Repositorio'){
             steps {
-                git branch: 'main', credentialsId: 'git-jenkins', url: 'https://github.com/AndresRojo12/node-jenkins.git'
+                git branch: 'main', credentialsId: 'git-jenkins', url: 'https://github.com/julioiud/node-jenkins.git'
             }
         }
-        stage('Construir imagen de Docker') {
+        stage('Construir imagen de Docker'){
             steps {
                 script {
                     withCredentials([
-                        string(credentialsId: 'URI_MONGO', variable: 'URI_MONGO')
+                        string(credentialsId: 'MONGO_URI', variable: 'MONGO_URI')
                     ]) {
-                        docker.build('proyecto-backend-microservicio:v1', '--build-arg URI_MONGO=${URI_MONGO} .')
+                        docker.build('proyectos-backend-micro:v1', '--build-arg MONGO_URI=${MONGO_URI} .')
                     }
                 }
             }
         }
-        stage('Desplegar contenedores Docker') {
+        stage('Desplegar contenedores Docker'){
             steps {
                 script {
                     withCredentials([
-                        string(credentialsId: 'URI_MONGO', variable: 'URI_MONGO')
+                            string(credentialsId: 'MONGO_URI', variable: 'MONGO_URI')
                     ]) {
-
-                        def sedCommand = "sed 's|\\${URI_MONGO}|${URI_MONGO}|g' docker-compose.yml > docker-compose-update.yml"
-                        def dockerComposeCommand = "docker-compose -f docker-compose-update.yml up -d"
-                        echo "Ejecutando comando de sed: ${sedCommand}"
-                        echo "Ejecutando comando de docker-compose: ${dockerComposeCommand}"
                         sh """
-                            ${sedCommand}
-                            ${dockerComposeCommand}
+                            sed 's|\\${MONGO_URI}|${MONGO_URI}|g' docker-compose.yml > docker-compose-update.yml
+                            docker-compose -f docker-compose-update.yml up -d
                         """
                     }
                 }
