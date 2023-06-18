@@ -24,9 +24,14 @@ pipeline {
                     withCredentials([
                         string(credentialsId: 'URI_MONGO', variable: 'URI_MONGO')
                     ]) {
+
+                        def sedCommand = "sed 's|\\${URI_MONGO}|${URI_MONGO}|g' docker-compose.yml > docker-compose-update.yml"
+                        def dockerComposeCommand = "docker-compose -f docker-compose-update.yml up -d"
+                        echo "Ejecutando comando de sed: ${sedCommand}"
+                        echo "Ejecutando comando de docker-compose: ${dockerComposeCommand}"
                         sh """
-                            sed 's|\\${URI_MONGO}|${URI_MONGO}|g' docker-compose.yml > docker-compose-update.yml
-                            docker-compose -f docker-compose-update.yml up -d
+                            ${sedCommand}
+                            ${dockerComposeCommand}
                         """
                     }
                 }
