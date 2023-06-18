@@ -13,7 +13,7 @@ pipeline {
                     withCredentials([
                         string(credentialsId: 'URI_MONGO', variable: 'URI_MONGO')
                     ]) {
-                        docker.build('proyecto-backend-microservicio:v1', '--build-arg URI_MONGO=${URI_MONGO} .')
+                        docker.build('proyecto-backend-microservicio:v1')
                     }
                 }
             }
