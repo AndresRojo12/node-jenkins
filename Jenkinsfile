@@ -13,7 +13,11 @@ pipeline {
                     withCredentials([
                         string(credentialsId: 'URI_MONGO', variable: 'URI_MONGO')
                     ]) {
-                        docker.build('proyectos-backend-micro:v1', '--build-arg URI_MONGO=${URI_MONGO} .')
+                       def dockerImage= docker.build('proyectos-backend-micro:v1', '.')
+
+                       dockerImage.inside{
+                        sh"docker build --build-arg URI_MONGO=${URI_MONGO} ."
+                       }
                     }
                 }
             }
